@@ -31,17 +31,17 @@ class _ChatScreenState extends State<ChatScreen> {
     final sessionTitle = generateSessionTitle();
     final sessionId = await _firestoreService.createSession(sessionTitle);
 
-    if (mounted) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ChatDetailScreen(
-            sessionId: sessionId,
-            patient: widget.patient,
-          ),
-        ),
-      );
-    }
+    // if (mounted) {
+    //   Navigator.push(
+    //     context,
+    //     MaterialPageRoute(
+    //       builder: (context) => ChatDetailScreen(
+    //         sessionId: sessionId,
+    //         patient: widget.patient,
+    //       ),
+    //     ),
+    //   );
+    // }
 
     setState(() {
       _isLoading = false;
@@ -54,7 +54,8 @@ class _ChatScreenState extends State<ChatScreen> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Delete Session'),
-          content: const Text('Are you sure you want to delete this session? This action cannot be undone.'),
+          content: const Text(
+              'Are you sure you want to delete this session? This action cannot be undone.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),

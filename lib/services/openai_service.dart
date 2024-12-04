@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:atris_peercode/models/patient_model.dart';
 import 'package:http/http.dart' as http;
-import '../secrets.dart';
+// import '../secrets.dart';
 
-class OpenAIService{
+class OpenAIService {
   String get apiKey => 'openaiKey';
 
-  Future<String> getPersonalizedFeedback(Patient patient, String message) async {
+  Future<String> getPersonalizedFeedback(
+      Patient patient, String message) async {
     final url = Uri.parse('https://api.openai.com/v1/chat/completions');
 
     final systemMessage = _getSystemMessage(patient);
@@ -24,10 +25,7 @@ class OpenAIService{
             "role": "system",
             "content": systemMessage,
           },
-          { 
-            'role': 'user', 
-            'content': message 
-          }
+          {'role': 'user', 'content': message}
         ],
         'max_tokens': 100,
       }),
@@ -40,7 +38,7 @@ class OpenAIService{
       throw Exception('Failed to load response from OpenAI: ${response.body}');
     }
   }
-  
+
   _getSystemMessage(Patient patient) {
     String coachingStyle = _getCoachingStyle(patient.discType);
 

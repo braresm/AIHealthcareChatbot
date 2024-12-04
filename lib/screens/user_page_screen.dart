@@ -1,3 +1,4 @@
+import 'package:atris_peercode/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:atris_peercode/models/patient_model.dart';
 
@@ -33,6 +34,17 @@ class UserPageScreen extends StatelessWidget {
                 Text(
                   'Age: ${patient.age}',
                   style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatScreen(
+                        patient: patient,
+                      ),
+                    ),
+                  ),
+                  child: const Text('Chat'),
                 ),
               ],
             ),
