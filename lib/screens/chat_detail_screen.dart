@@ -1,6 +1,8 @@
+import 'package:atris_peercode/components/record_button.dart';
 import 'package:atris_peercode/services/firestore_service.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../services/openai_service.dart';
 import '../models/patient_model.dart';
 
@@ -24,6 +26,18 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   final FirestoreService _firestoreService = FirestoreService();
   final OpenAIService _openAIService = OpenAIService();
 
+  Future<void> requestMicPermission() async {
+    var status = await Permission.microphone.request();
+    if (status.isGranted) {
+      // Permission granted
+    } else if (status.isDenied) {
+      // Permission denied
+    } else if (status.isPermanentlyDenied) {
+      // Permission permanently denied, open app settings
+      openAppSettings();
+    }
+  }
+
   Future<void> _sendMessage(String content) async {
     if (content.isEmpty) return;
 
@@ -34,7 +48,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         sessionId: widget.sessionId,
       );
 
-      final assistantResponse = await _openAIService.getPersonalizedFeedback(widget.patient, content);
+      final assistantResponse =
+          await _openAIService.getPersonalizedFeedback(widget.patient, content);
 
       await _firestoreService.saveMessage(
         content: assistantResponse,
@@ -46,9 +61,16 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     } catch (e) {
       print('Error sending message: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to send the message. Please try again.')),
+        const SnackBar(
+            content: Text('Failed to send the message. Please try again.')),
       );
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    requestMicPermission();
   }
 
   @override
@@ -66,7 +88,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                 }
 
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('No messages for this session.'));
+                  return const Center(
+                      child: Text('No messages for this session.'));
                 }
 
                 final messages = snapshot.data!;
@@ -102,6 +125,13 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                       border: OutlineInputBorder(),
                     ),
                   ),
+                ),
+                const SizedBox(width: 8),
+                RecordButton(
+                  onRecordedText: (recordedText) {
+                    print('Recorded Text: $recordedText');
+                    _sendMessage(recordedText);
+                  },
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
